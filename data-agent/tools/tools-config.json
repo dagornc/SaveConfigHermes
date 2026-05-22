@@ -1,0 +1,32 @@
+{
+  "tools": [
+    {
+      "name": "rk-hermes",
+      "type": "http",
+      "url": "https://github.com/ogallotti/rtk-hermes",
+      "method": "POST",
+      "enabled": true
+    },
+    {
+      "name": "skillclaw",
+      "type": "http",
+      "url": "https://github.com/AMAP-ML/SkillClaw",
+      "method": "POST",
+      "enabled": true
+    },
+    {
+      "name": "lintlang",
+      "type": "http",
+      "url": "https://github.com/roli-lpci/lintlang",
+      "method": "POST",
+      "enabled": true
+    },
+    {
+      "name": "hermes-web-search",
+      "type": "http",
+      "url": "https://github.com/robbyczgw-cla/hermes-web-search-plus",
+      "method": "POST",
+      "enabled": true
+    }
+  ]
+}

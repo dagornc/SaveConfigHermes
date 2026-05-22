@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "not-human-search": {
+      "type": "url",
+      "url": "https://nothumansearch.ai/mcp",
+      "enabled": true
+    },
+    "clarvia": {
+      "command": "npx",
+      "args": ["-y", "clarvia-mcp-server"],
+      "enabled": true
+    },
+    "clarvia-remote": {
+      "type": "url",
+      "url": "https://clarvia-api.onrender.com/mcp/",
+      "enabled": false
+    }
+  }
+}

@@ -1,0 +1,7 @@
+.env
+*.key
+*.pem
+data-hindsight/
+data-workspace/
+*.log
+sync.log

@@ -1,0 +1,148 @@
+name: hermes
+
+services:
+
+  hermes-agent:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes-agent
+    restart: unless-stopped
+    command: ["gateway", "run"]
+
+    env_file:
+      - .env
+
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8642
+
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: 0.0.0.0
+      API_SERVER_PORT: "8642"
+      API_SERVER_KEY: ${API_SERVER_KEY}
+
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_HOST: 0.0.0.0
+      HERMES_DASHBOARD_PORT: "9119"
+      HERMES_DASHBOARD_TUI: "1"
+
+      HERMES_PASSWORD: ${HERMES_PASSWORD}
+
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      DEFAULT_MODEL: ${DEFAULT_MODEL}
+
+      HERMES_FAST_MODEL: ${HERMES_FAST_MODEL:-${DEFAULT_MODEL}}
+      HERMES_BRAIN_MODEL: ${HERMES_BRAIN_MODEL:-${DEFAULT_MODEL}}
+      HERMES_COMPLEX_MODEL: ${HERMES_COMPLEX_MODEL:-${DEFAULT_MODEL}}
+      HERMES_LLM_ENDPOINT: ${HERMES_LLM_ENDPOINT}
+      HERMES_LLM_API_KEY: ${HERMES_LLM_API_KEY}
+
+      HINDSIGHT_MODE: ${HINDSIGHT_MODE}
+      HINDSIGHT_LLM_PROVIDER: ${HINDSIGHT_LLM_PROVIDER}
+      HINDSIGHT_LLM_API_KEY: ${HINDSIGHT_LLM_API_KEY}
+      HINDSIGHT_LLM_BASE_URL: ${HINDSIGHT_LLM_BASE_URL}
+      HINDSIGHT_LLM_MODEL: ${HINDSIGHT_LLM_MODEL}
+
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
+
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN:-}
+      SLACK_CHANNEL: ${SLACK_CHANNEL:-}
+
+      GITHUB_PAT: ${GITHUB_PAT}
+      GITHUB_API_KEY: ${GITHUB_API_KEY}
+      GITHUB_USER: ${GITHUB_USER}
+      GITHUB_REPO: ${GITHUB_REPO}
+
+      MCP_NOT_HUMAN_URL: ${MCP_NOT_HUMAN_URL}
+      MCP_CLARVIA_REMOTE_URL: ${MCP_CLARVIA_REMOTE_URL}
+
+      TOOL_RK_HERMES_URL: ${TOOL_RK_HERMES_URL}
+      TOOL_SKILLCLAW_URL: ${TOOL_SKILLCLAW_URL}
+      TOOL_LINTLANG_URL: ${TOOL_LINTLANG_URL}
+      TOOL_WEB_SEARCH_URL: ${TOOL_WEB_SEARCH_URL}
+
+    expose:
+      - "8642"
+      - "9119"
+
+    networks:
+      - gateway
+
+    volumes:
+      - ./data-agent:/opt/data
+      - ./data-hindsight:/root/.hindsight
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    user: root
+
+  hermes-workspace:
+    image: ghcr.io/outsourc-e/hermes-workspace:latest
+    container_name: hermes-workspace
+    restart: unless-stopped
+
+    depends_on:
+      - hermes-agent
+
+    env_file:
+      - .env
+
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      COOKIE_SECURE: "0"
+
+      BACKEND_URL: ${BACKEND_URL}
+      CLAUDE_API_URL: ${CLAUDE_API_URL}
+      CLAUDE_BASE_URL: ${CLAUDE_BASE_URL}
+      CLAUDE_API_KEY: ${CLAUDE_API_KEY}
+      CLAUDE_AUTH_TOKEN: ${CLAUDE_AUTH_TOKEN}
+      CLAUDE_API_TOKEN: ${CLAUDE_API_TOKEN}
+      CLAUDE_DASHBOARD_TOKEN: ${CLAUDE_DASHBOARD_TOKEN}
+      API_KEY: ${API_KEY}
+
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      DEFAULT_MODEL: ${DEFAULT_MODEL}
+
+      HERMES_API_URL: ${HERMES_API_URL}
+      HERMES_API_TOKEN: ${HERMES_API_TOKEN}
+      HERMES_GATEWAY_URL: ${HERMES_GATEWAY_URL}
+      HERMES_DASHBOARD_URL: ${HERMES_DASHBOARD_URL}
+      CLAUDE_DASHBOARD_URL: ${CLAUDE_DASHBOARD_URL}
+
+      HERMES_PASSWORD: ${HERMES_PASSWORD}
+
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
+
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN:-}
+      SLACK_CHANNEL: ${SLACK_CHANNEL:-}
+
+      GITHUB_PAT: ${GITHUB_PAT}
+      GITHUB_API_KEY: ${GITHUB_API_KEY}
+      GITHUB_USER: ${GITHUB_USER}
+      GITHUB_REPO: ${GITHUB_REPO}
+
+    networks:
+      - gateway
+
+    volumes:
+      - ./data-workspace:/usr/src/app/storage
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=gateway"
+      - "traefik.http.routers.hermes.rule=Host(`hermes.breizh.ai`)"
+      - "traefik.http.routers.hermes.entrypoints=web"
+      - "traefik.http.services.hermes.loadbalancer.server.port=3000"
+
+networks:
+  gateway:
+    external: true
